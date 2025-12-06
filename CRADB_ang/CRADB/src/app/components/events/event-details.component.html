@@ -1,0 +1,79 @@
+<div class="event-details-container">
+  <button class="back-btn" (click)="goBack()">← Back to Events</button>
+  
+  <div *ngIf="loading" class="loading">Loading event details...</div>
+  
+  <div *ngIf="!loading && event" class="event-details">
+    <div class="event-header">
+      <div class="event-image">
+        <img [src]="getEventImage()" [alt]="event.EventTitle">
+        <div class="event-status" [class]="getEventStatusClass()">{{getEventStatus()}}</div>
+      </div>
+      
+      <div class="event-info">
+        <h1>{{event.EventTitle}}</h1>
+        <p class="event-description">{{event.Description}}</p>
+        
+        <div class="event-meta">
+          <div class="meta-item">
+            <i class="fas fa-calendar"></i>
+            <span>{{formatEventDate(event.Date)}}</span>
+          </div>
+          <div class="meta-item">
+            <i class="fas fa-clock"></i>
+            <span>{{formatTime(event.StartTime)}} - {{formatTime(event.EndTime)}}</span>
+          </div>
+          <div class="meta-item" *ngIf="event.LocationName">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>{{event.LocationName}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="rsvp-section" *ngIf="isUpcoming()">
+      <h3>Will you attend this event?</h3>
+      <div class="rsvp-buttons">
+        <button 
+          class="rsvp-btn yes" 
+          [class.active]="userRsvpStatus === 'Yes'"
+          (click)="rsvp(RsvpStatus.Yes)">
+          👍 Yes, I'll be there
+        </button>
+        <button 
+          class="rsvp-btn maybe" 
+          [class.active]="userRsvpStatus === 'Maybe'"
+          (click)="rsvp(RsvpStatus.Maybe)">
+          🤔 Maybe
+        </button>
+        <button 
+          class="rsvp-btn no" 
+          [class.active]="userRsvpStatus === 'No'"
+          (click)="rsvp(RsvpStatus.No)">
+          👎 Can't make it
+        </button>
+      </div>
+    </div>
+    
+    <div class="rsvp-stats">
+      <h3>Event Responses</h3>
+      <div class="stats-grid">
+        <div class="stat-card yes">
+          <div class="stat-icon">👍</div>
+          <div class="stat-number">{{eventCounts.interested}}</div>
+          <div class="stat-label">Going</div>
+        </div>
+        <div class="stat-card maybe">
+          <div class="stat-icon">🤔</div>
+          <div class="stat-number">{{eventCounts.maybe}}</div>
+          <div class="stat-label">Maybe</div>
+        </div>
+        <div class="stat-card no">
+          <div class="stat-icon">👎</div>
+          <div class="stat-number">{{eventCounts.notInterested}}</div>
+          <div class="stat-label">Not Going</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

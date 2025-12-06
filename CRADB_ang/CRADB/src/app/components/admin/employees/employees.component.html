@@ -1,0 +1,249 @@
+<div class="admin-content">
+  <div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-start mb-4" style="padding-top: 20px;">
+      <div>
+        <h2 class="h3 mb-1" style="font-weight: 600;">Employee Management</h2>
+        <p class="text-muted mb-0" style="font-size: 14px;">Manage employee data and information.</p>
+      </div>
+      <div class="position-relative">
+        <div class="d-flex align-items-center gap-2" (click)="toggleProfileDropdown()" style="cursor: pointer;">
+          <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+            <span style="font-size: 14px;">{{ getUserInitials() }}</span>
+          </div>
+          <span style="font-size: 14px; font-weight: 500;">{{ getUserRole() }}</span>
+          <i class="fas fa-chevron-down" style="font-size: 12px;"></i>
+        </div>
+        
+        @if (showProfileDropdown) {
+          <div class="dropdown-menu show position-absolute" style="right: 0; top: 100%; margin-top: 8px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <a class="dropdown-item" routerLink="/profile" style="padding: 8px 16px;">
+              <i class="fas fa-user me-2"></i>Profile
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" (click)="logout()" style="padding: 8px 16px; cursor: pointer;">
+              <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="header-section">
+      <div class="d-flex align-items-center gap-3">
+        <h5 class="employee-count">
+          Founding <span class="count-number">{{filteredEmployees.length}} Members</span>
+        </h5>
+      </div>
+      
+      <div class="d-flex align-items-center gap-2">
+        <button class="btn-filter" (click)="toggleFilters()">
+          <i class="fas fa-filter me-2"></i>Filter
+        </button>
+        <button class="btn-add" (click)="showAddEmployeeModal = true">
+          Add a new employee
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div *ngIf="showFilters" class="filters-panel mb-4">
+      <div class="row">
+        <div class="col-md-3">
+          <select class="form-select" [(ngModel)]="selectedDepartment" (change)="applyFilters()">
+            <option value="">All Departments</option>
+            <option *ngFor="let dept of departments" [value]="dept.DepartmentId">{{dept.DepartmentName}}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" [(ngModel)]="selectedLocation" (change)="applyFilters()">
+            <option value="">All Locations</option>
+            <option *ngFor="let loc of locations" [value]="loc.LocationId">{{loc.Name}}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+            <option value="">All Status</option>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-text">
+            <i class="fas fa-search"></i>
+          </span>
+          <input type="text" class="form-control" placeholder="Search employees..." 
+                 [(ngModel)]="searchTerm" (input)="searchEmployees()">
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Loading employees...</p>
+    </div>
+
+    <div *ngIf="!loading && paginatedEmployees && paginatedEmployees.length > 0" class="employees-grid">
+      <div *ngFor="let employee of paginatedEmployees; trackBy: trackByEmployeeId" class="employee-card">
+        <div *ngIf="employee" class="employee-content">
+          <div class="status-badge" [class]="employee.IsActive ? 'status-in' : 'status-out'">
+            {{employee.IsActive ? 'In' : 'Out'}}
+          </div>
+          <button class="menu-btn">
+            <i class="fas fa-ellipsis-v"></i>
+          </button>
+          
+          <div class="employee-avatar">
+            <div class="avatar-placeholder">
+              {{ getEmployeeInitials(employee) }}
+            </div>
+          </div>
+          
+          <div class="employee-info">
+            <h6 class="employee-id">{{ employee.EmployeeId }} - {{ employee.FirstName }} {{ employee.LastName }}</h6>
+            <p class="employee-role">{{ employee.Title || employee.Role }}</p>
+            
+            <div class="contact-info">
+              <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <span>{{ employee.Email }}</span>
+              </div>
+              <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <span>{{ employee.PhoneNumber || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && filteredEmployees.length === 0 && searchTerm" class="no-results">
+      <i class="fas fa-search fa-3x text-muted mb-3"></i>
+      <h5>No employees found</h5>
+      <p class="text-muted">Try adjusting your search criteria</p>
+    </div>
+
+    <div *ngIf="!loading && employees.length === 0" class="no-employees">
+      <i class="fas fa-users fa-3x text-muted mb-3"></i>
+      <h5>No employees yet</h5>
+      <p class="text-muted">Start by adding your first employee</p>
+      <button class="btn-add" routerLink="/admin/user-management">
+        <i class="fas fa-plus me-2"></i>Add Employee
+      </button>
+    </div>
+
+    <div class="pagination-section">
+      <div class="pagination-info">
+        <span>View</span>
+        <select class="page-size-select" [(ngModel)]="pageSize" (change)="updatePageSize()">
+          <option value="8">8</option>
+          <option value="16">16</option>
+          <option value="24">24</option>
+        </select>
+        <span>Employees per page</span>
+      </div>
+      
+      <div class="pagination-results">
+        <span>Showing {{getDisplayedCount()}}/{{employees.length}} results</span>
+      </div>
+      
+      <div class="pagination-controls">
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="previousPage()">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button *ngFor="let page of getPageNumbers()" 
+                class="page-btn" 
+                [class.active]="page === currentPage"
+                (click)="goToPage(page)">
+          {{page}}
+        </button>
+        <button class="page-btn" [disabled]="currentPage === getTotalPages()" (click)="nextPage()">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Add Employee Modal -->
+    <div *ngIf="showAddEmployeeModal" class="modal-overlay" (click)="closeModal($event)">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h5>Add New Employee</h5>
+          <button class="close-btn" (click)="showAddEmployeeModal = false">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="employeeForm" (ngSubmit)="addEmployee()">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Employee ID *</label>
+                <input type="text" formControlName="employeeId" class="form-control" placeholder="Auto-generated" readonly>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Email *</label>
+                <input type="email" formControlName="email" class="form-control" placeholder="john@company.com">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">First Name *</label>
+                <input type="text" formControlName="firstName" class="form-control" placeholder="John" (input)="generateEmployeeId()">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Last Name *</label>
+                <input type="text" formControlName="lastName" class="form-control" placeholder="Doe" (input)="generateEmployeeId()">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Phone Number *</label>
+                <input type="tel" formControlName="phoneNumber" class="form-control" placeholder="+1234567890">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Title</label>
+                <input type="text" formControlName="title" class="form-control" placeholder="Software Engineer">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Department</label>
+                <select formControlName="departmentId" class="form-select">
+                  <option value="">Select Department</option>
+                  <option *ngFor="let dept of departments" [value]="dept.DepartmentId">{{dept.DepartmentName}}</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Location</label>
+                <select formControlName="locationId" class="form-select">
+                  <option value="">Select Location</option>
+                  <option *ngFor="let loc of locations" [value]="loc.LocationId">{{loc.Name}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Password *</label>
+                <input type="password" formControlName="password" class="form-control" placeholder="Password">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Confirm Password *</label>
+                <input type="password" formControlName="confirmPassword" class="form-control" placeholder="Confirm Password">
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn-cancel" (click)="showAddEmployeeModal = false">Cancel</button>
+              <button type="submit" class="btn-save" [disabled]="employeeForm.invalid || saving">{{saving ? 'Adding...' : 'Add Employee'}}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

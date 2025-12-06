@@ -1,0 +1,216 @@
+<app-sidebar></app-sidebar>
+
+<div class="main-content" style="margin-left: 200px; padding: 0 30px; background: #f8f9fa; min-height: 100vh;">
+  <div class="container-fluid" style="padding-top: 0;">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-start mb-4" style="padding-top: 20px;">
+      <div>
+        <h2 class="h3 mb-1" style="font-weight: 600;">Desks Management</h2>
+        <p class="text-muted mb-0" style="font-size: 14px;">View and manage all desk spaces and workstations.</p>
+      </div>
+      <div class="position-relative">
+        <div class="d-flex align-items-center gap-2" (click)="toggleProfileDropdown()" style="cursor: pointer;">
+          <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+            <span style="font-size: 14px;">{{ getUserInitials() }}</span>
+          </div>
+          <span style="font-size: 14px; font-weight: 500;">{{ getUserRole() }}</span>
+          <i class="fas fa-chevron-down" style="font-size: 12px;"></i>
+        </div>
+        
+        @if (showProfileDropdown) {
+          <div class="dropdown-menu show position-absolute" style="right: 0; top: 100%; margin-top: 8px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <a class="dropdown-item" routerLink="/profile" style="padding: 8px 16px;">
+              <i class="fas fa-user me-2"></i>Profile
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" (click)="logout()" style="padding: 8px 16px; cursor: pointer;">
+              <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="mb-0">All Desks ({{filteredDesks.length}})</h4>
+          <button class="btn btn-primary" (click)="loadDesks()">
+            <i class="fas fa-sync me-2"></i>Refresh
+          </button>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <input type="text" class="form-control" placeholder="Search desks..." 
+                   [(ngModel)]="searchTerm" (input)="applyFilters()">
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" [(ngModel)]="statusFilter" (change)="applyFilters()">
+              <option value="">All Status</option>
+              <option value="available">Available</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="blocked">Blocked</option>
+            </select>
+          </div>
+        </div>
+
+        @if (loading) {
+          <div class="text-center py-5">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading desks...</p>
+          </div>
+        }
+
+        @if (!loading && desks.length === 0) {
+          <div class="text-center py-5">
+            <i class="fas fa-desktop fa-3x text-muted mb-3"></i>
+            <h5>No Desks Found</h5>
+            <p class="text-muted">Create desk resources in the Resources section to see them here</p>
+            <button class="btn btn-primary" routerLink="/admin/resources">
+              <i class="fas fa-cube me-2"></i>Go to Resources
+            </button>
+          </div>
+        }
+
+        @if (!loading && filteredDesks.length > 0) {
+          <div class="row">
+            @for (desk of filteredDesks; track desk.Id) {
+              <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card">
+                  @if (desk.DeskImage) {
+                    <img [src]="getImageUrl(desk.DeskImage)" class="card-img-top" alt="{{ desk.DeskName }}" style="height: 200px; object-fit: cover;">
+                  } @else {
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                      <i class="fas fa-desktop fa-3x text-muted"></i>
+                    </div>
+                  }
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">{{ desk.DeskName }}</h6>
+                    <span class="badge bg-secondary">Desk</span>
+                  </div>
+                  <div class="card-body">
+                    <div class="mb-2">
+                      <small class="text-muted">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        {{ desk.LocationName }} - {{ desk.BuildingName }} - {{ desk.FloorName }}
+                      </small>
+                    </div>
+                    
+                    @if (desk.Description) {
+                      <p class="card-text">{{ desk.Description }}</p>
+                    }
+                    
+                    <div class="equipment-list">
+                      <h6 class="small mb-2">Equipment:</h6>
+                      <div class="d-flex flex-wrap gap-1">
+                        @if (desk.HasMonitor) {
+                          <span class="badge bg-success">Monitor</span>
+                        }
+                        @if (desk.HasKeyboard) {
+                          <span class="badge bg-success">Keyboard</span>
+                        }
+                        @if (desk.HasMouse) {
+                          <span class="badge bg-success">Mouse</span>
+                        }
+                        @if (desk.HasHeadset) {
+                          <span class="badge bg-success">Headset</span>
+                        }
+                        @if (desk.HasWebcam) {
+                          <span class="badge bg-success">Webcam</span>
+                        }
+                        @if (!desk.HasMonitor && !desk.HasKeyboard && !desk.HasMouse && !desk.HasHeadset && !desk.HasWebcam) {
+                          <span class="text-muted">No equipment</span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <div class="d-flex gap-2 flex-wrap">
+                      <button class="btn btn-sm btn-primary" (click)="editDesk(desk)">
+                        <i class="fas fa-edit me-1"></i>Edit
+                      </button>
+                      <button class="btn btn-sm btn-danger" (click)="deleteDesk(desk)">
+                        <i class="fas fa-trash me-1"></i>Delete
+                      </button>
+                      <button class="btn btn-sm btn-outline-warning" 
+                              (click)="toggleMaintenance(desk)"
+                              [disabled]="desk.IsBlocked">
+                        <i class="fas fa-tools me-1"></i>
+                        {{ desk.IsUnderMaintenance ? 'End Maintenance' : 'Maintenance' }}
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger" 
+                              (click)="toggleBlock(desk)"
+                              [disabled]="desk.IsUnderMaintenance">
+                        <i class="fas fa-ban me-1"></i>
+                        {{ desk.IsBlocked ? 'Unblock' : 'Block' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        @if (editingDesk) {
+          <div class="modal-overlay" (click)="cancelEdit()">
+            <div class="modal-dialog" (click)="$event.stopPropagation()">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5>Edit Desk: {{ editingDesk.DeskName }}</h5>
+                  <button class="btn-close" (click)="cancelEdit()"></button>
+                </div>
+                <div class="modal-body">
+                  <form [formGroup]="deskForm" (ngSubmit)="saveDesk()">
+                    <div class="mb-3">
+                      <label class="form-label">Desk Name *</label>
+                      <input type="text" class="form-control" formControlName="deskName">
+                    </div>
+                    
+                    <div class="mb-3">
+                      <label class="form-label">Equipment</label>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" formControlName="hasMonitor">
+                            <label class="form-check-label">Monitor</label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" formControlName="hasKeyboard">
+                            <label class="form-check-label">Keyboard</label>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" formControlName="hasMouse">
+                            <label class="form-check-label">Mouse</label>
+                          </div>
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" formControlName="hasDockingStation">
+                            <label class="form-check-label">Docking Station</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                      <button type="submit" class="btn btn-primary" [disabled]="deskForm.invalid || saving">
+                        {{ saving ? 'Saving...' : 'Save Changes' }}
+                      </button>
+                      <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,99 @@
+<app-navigation></app-navigation>
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <p class="welcome-text">Welcome back, {{currentUser?.firstName || 'User'}}!</p>
+  </div>
+
+  <div class="dashboard-stats">
+    <div class="stat-card active">
+      <div class="stat-icon">📅</div>
+      <div class="stat-content">
+        <h3>Active Bookings</h3>
+        <p class="stat-number">{{activeBookings.length}}</p>
+      </div>
+    </div>
+    <div class="stat-card upcoming">
+      <div class="stat-icon">⏰</div>
+      <div class="stat-content">
+        <h3>Upcoming Bookings</h3>
+        <p class="stat-number">{{upcomingBookings.length}}</p>
+      </div>
+    </div>
+    <div class="stat-card total">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <h3>Total Bookings</h3>
+        <p class="stat-number">{{recentBookings.length}}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="recent-bookings">
+    <div class="section-header">
+      <h2>My Bookings</h2>
+      <button class="view-all-btn" (click)="viewAllBookings()">View All</button>
+    </div>
+    
+    <div *ngIf="recentBookings.length === 0" class="no-bookings">
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>No bookings found</h3>
+        <p>You don't have any bookings yet. Start by booking a room!</p>
+        <button class="book-now-btn" (click)="navigateToRooms()">Book a Room</button>
+      </div>
+    </div>
+    
+    <div class="bookings-grid" *ngIf="recentBookings.length > 0">
+      <div *ngFor="let booking of recentBookings" class="booking-card">
+        <div class="booking-header">
+          <div class="booking-title">
+            <h4>{{booking.MeetingName || booking.Purpose || 'Meeting'}}</h4>
+            <span class="booking-id">#{{booking.BookingId}}</span>
+          </div>
+          <span class="status-badge" [class]="getStatusClass(booking.SessionStatus)">{{getStatusText(booking.SessionStatus)}}</span>
+        </div>
+        
+        <div class="booking-details">
+          <div class="detail-item">
+            <span class="detail-icon">🏢</span>
+            <span class="detail-text">{{booking.ResourceName || 'Unknown Resource'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon">📍</span>
+            <span class="detail-text">{{booking.LocationName || 'Loading location...'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon">📅</span>
+            <span class="detail-text">{{booking.StartTime | date:'MMM d, y'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon">⏰</span>
+            <span class="detail-text">{{booking.StartTime | date:'h:mm a'}} - {{booking.EndTime | date:'h:mm a'}}</span>
+          </div>
+        </div>
+        
+        <div class="booking-actions" *ngIf="canCheckIn(booking) || canCheckOut(booking) || isBookingOverdue(booking)">
+          <div class="action-container">
+            <span class="action-label">{{getToggleLabel(booking)}}</span>
+            <div class="toggle-switch" 
+                 [class.checked-in]="getStatusText(booking.SessionStatus) === 'Checked In' && !isBookingOverdue(booking)"
+                 [class.overdue]="isBookingOverdue(booking) && getStatusText(booking.SessionStatus) === 'Checked In'"
+                 [class.disabled]="isBookingOverdue(booking)"
+                 (click)="!isBookingOverdue(booking) && toggleCheckInOut(booking)">
+              <div class="toggle-slider">
+                <span class="toggle-icon">{{getToggleIcon(booking)}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="notifications-section">
+    <app-user-notifications></app-user-notifications>
+  </div>
+</div>
+</div>

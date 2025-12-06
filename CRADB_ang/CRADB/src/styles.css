@@ -1,0 +1,31 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+}
+
+.btn {
+  border-radius: 0.375rem;
+}
+
+.card {
+  border-radius: 0.5rem;
+}
+
+.table th {
+  font-weight: 600;
+  color: #495057;
+}
+
+.badge {
+  font-size: 0.75em;
+}
+
+.admin-content {
+  padding: 20px 30px;
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 80px);
+  margin: 0;
+}
