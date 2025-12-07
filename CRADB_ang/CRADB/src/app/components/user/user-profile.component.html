@@ -1,5 +1,3 @@
-<app-navigation></app-navigation>
-
 <div class="profile-container">
   <div class="profile-header">
     <h1>User Profile</h1>
@@ -9,9 +7,18 @@
   <div class="profile-card">
     <div class="cover-image"></div>
     <div class="profile-avatar">
-      <div class="avatar-circle">{{getUserInitials()}}</div>
+      <div class="avatar-circle" *ngIf="!currentUser?.ProfileImage && !imagePreview">
+        {{getUserInitials()}}
+      </div>
+      <img *ngIf="imagePreview || currentUser?.ProfileImage" [src]="imagePreview || currentUser?.ProfileImage"
+        class="avatar-image" alt="Profile Avatar">
+
+      <div class="avatar-overlay" (click)="fileInput.click()">
+        <i class="fas fa-camera"></i>
+      </div>
+      <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
     </div>
-    
+
     <div class="profile-content">
       <div class="profile-info">
         <h2 class="user-name">{{currentUser?.FirstName}} {{currentUser?.LastName}}</h2>

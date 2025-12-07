@@ -1,4 +1,3 @@
-<app-navigation></app-navigation>
 <div class="desk-container">
   <div class="page-header">
     <h1>Available Desks</h1>
@@ -9,28 +8,24 @@
     <div class="search-bar">
       <div class="search-input-container">
         <span class="search-icon">🔍</span>
-        <input 
-          type="text" 
-          placeholder="Search desks by name or location..." 
-          [(ngModel)]="searchTerm"
-          (input)="filterDesks()"
-          class="search-input">
+        <input type="text" placeholder="Search desks by name or location..." [(ngModel)]="searchTerm"
+          (input)="filterDesks()" class="search-input">
       </div>
     </div>
-    
+
     <div class="filter-controls">
       <select [(ngModel)]="locationFilter" (change)="filterDesks()" class="filter-select">
         <option value="">All Locations</option>
         <option *ngFor="let location of locations" [value]="location.Name">{{location.Name}}, {{location.City}}</option>
       </select>
-      
+
       <select [(ngModel)]="amenityFilter" (change)="filterDesks()" class="filter-select">
         <option value="">All Amenities</option>
         <option value="monitor">With Monitor</option>
         <option value="window">Near Window</option>
         <option value="keyboard">With Keyboard</option>
       </select>
-      
+
       <button class="filter-btn" [class.active]="showAvailableOnly" (click)="toggleAvailableOnly()">
         <span class="filter-icon">✅</span>
         Available Only
@@ -38,20 +33,7 @@
     </div>
   </div>
 
-  <div class="desk-stats">
-    <div class="stat-item">
-      <span class="stat-number">{{getTotalDesks()}}</span>
-      <span class="stat-label">Total Desks</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-number">{{getAvailableDesks()}}</span>
-      <span class="stat-label">Available</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-number">{{getOccupiedDesks()}}</span>
-      <span class="stat-label">Occupied</span>
-    </div>
-  </div>
+
 
   <div *ngIf="loading" class="loading-state">
     <div class="loading-spinner"></div>
@@ -73,23 +55,23 @@
           {{isAvailable(desk) ? 'Available' : 'Occupied'}}
         </div>
       </div>
-      
+
       <div class="desk-content">
         <div class="desk-header">
           <h3>{{desk.DeskName}}</h3>
           <span class="desk-id">#{{desk.DeskId}}</span>
         </div>
-        
+
         <div class="desk-location">
           <span class="location-icon">📍</span>
           <span>{{desk.LocationName}}, {{desk.BuildingName}}</span>
         </div>
-        
+
         <div class="desk-floor">
           <span class="floor-icon">🏢</span>
           <span>{{desk.FloorName}}</span>
         </div>
-        
+
         <div class="desk-amenities">
           <div class="amenity-item" *ngIf="desk.HasMonitor">
             <span class="amenity-icon">🖥️</span>
@@ -108,21 +90,15 @@
             <span>Window View</span>
           </div>
         </div>
-        
+
         <p *ngIf="desk.Description" class="desk-description">{{desk.Description}}</p>
-        
+
         <div class="desk-actions">
-          <button 
-            *ngIf="isAvailable(desk)" 
-            class="book-btn"
-            (click)="bookDesk(desk)">
+          <button *ngIf="isAvailable(desk)" class="book-btn" (click)="bookDesk(desk)">
             <span class="btn-icon">📅</span>
             Book Desk
           </button>
-          <button 
-            *ngIf="!isAvailable(desk)" 
-            class="unavailable-btn" 
-            disabled>
+          <button *ngIf="!isAvailable(desk)" class="unavailable-btn" disabled>
             <span class="btn-icon">🚫</span>
             Not Available
           </button>

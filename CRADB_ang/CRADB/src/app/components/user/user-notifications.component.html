@@ -1,40 +1,30 @@
-<div class="user-notifications">
+<div class="notifications-container">
   <div class="header">
-    <h4><i class="fas fa-bell me-2"></i>Your Notifications</h4>
-    <button *ngIf="unreadCount > 0" class="btn btn-sm btn-outline-primary" (click)="markAllAsRead()">
-      Mark all as read
-    </button>
+    <h1>Notifications</h1>
+    <p>Stay updated with your bookings and events</p>
   </div>
 
-  <div *ngIf="loading" class="text-center py-4">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading notifications...</p>
   </div>
 
   <div *ngIf="!loading && notifications.length === 0" class="empty-state">
-    <i class="fas fa-bell-slash"></i>
-    <h5>No notifications</h5>
-    <p>You're all caught up! New notifications will appear here.</p>
+    <div class="empty-icon">🔔</div>
+    <h3>No new notifications</h3>
+    <p>You're all caught up!</p>
   </div>
 
-  <div *ngIf="!loading && notifications.length > 0" class="notifications-list">
-    <div *ngFor="let notification of notifications" 
-         class="notification-item" 
-         [class.unread]="!notification.IsRead"
-         (click)="markAsRead(notification.Id)">
-      <div class="notification-icon">
-        <i class="fas" [class]="getNotificationIcon(notification.Type)"></i>
+  <div class="notification-list" *ngIf="!loading && notifications.length > 0">
+    <div class="notification-card" *ngFor="let note of notifications">
+      <div class="note-icon">
+        <i class="fas fa-info-circle"></i>
       </div>
-      <div class="notification-content">
-        <h6>{{notification.Title}}</h6>
-        <p>{{notification.Message}}</p>
-        <div class="notification-meta">
-          <span class="time">{{formatDate(notification.CreatedAt)}}</span>
-          <span *ngIf="notification.BookingId" class="booking-id">Booking #{{notification.BookingId}}</span>
-        </div>
+      <div class="note-content">
+        <div class="note-title">{{note.Title}}</div>
+        <div class="note-message">{{note.Message}}</div>
+        <div class="note-time">{{note.CreatedAt | date:'medium'}}</div>
       </div>
-      <div *ngIf="!notification.IsRead" class="unread-indicator"></div>
     </div>
   </div>
 </div>

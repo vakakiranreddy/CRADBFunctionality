@@ -17,7 +17,9 @@ namespace ConferenceRoomBooking.Business.Interfaces.IServices
 
         // Employee Profile (Self-access section)
         Task<UserProfileDto?> GetProfileAsync(int userId);
+
         Task UpdateProfileAsync(int userId, UpdateProfileDto dto);
+        Task UploadProfileImageAsync(int userId, Microsoft.AspNetCore.Http.IFormFile image);
 
         // Validation Utilities
         Task<bool> IsEmailAvailableAsync(string email);

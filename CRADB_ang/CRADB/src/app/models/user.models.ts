@@ -12,4 +12,5 @@ export interface UserResponse {
   IsActive: boolean;
   LastLoginAt?: Date;
   CreatedAt: Date;
+  ProfileImage?: string;
 }

@@ -1,27 +1,36 @@
-<app-navigation></app-navigation>
 <div class="dashboard-container">
+  <!-- Header -->
   <div class="dashboard-header">
-    <h1>Dashboard</h1>
-    <p class="welcome-text">Welcome back, {{currentUser?.firstName || 'User'}}!</p>
+    <div>
+      <h1>Dashboard</h1>
+      <p class="welcome-text">Welcome back, {{currentUser?.firstName || 'User'}}!</p>
+    </div>
   </div>
 
+  <!-- Key Stats -->
   <div class="dashboard-stats">
     <div class="stat-card active">
-      <div class="stat-icon">📅</div>
+      <div class="stat-icon">
+        <i class="fas fa-calendar-check"></i>
+      </div>
       <div class="stat-content">
         <h3>Active Bookings</h3>
         <p class="stat-number">{{activeBookings.length}}</p>
       </div>
     </div>
     <div class="stat-card upcoming">
-      <div class="stat-icon">⏰</div>
+      <div class="stat-icon">
+        <i class="fas fa-clock"></i>
+      </div>
       <div class="stat-content">
-        <h3>Upcoming Bookings</h3>
+        <h3>Upcoming</h3>
         <p class="stat-number">{{upcomingBookings.length}}</p>
       </div>
     </div>
     <div class="stat-card total">
-      <div class="stat-icon">📊</div>
+      <div class="stat-icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
       <div class="stat-content">
         <h3>Total Bookings</h3>
         <p class="stat-number">{{recentBookings.length}}</p>
@@ -29,71 +38,85 @@
     </div>
   </div>
 
+  <!-- Main Grid -->
   <div class="dashboard-grid">
+
+    <!-- Bookings Section -->
     <div class="recent-bookings">
-    <div class="section-header">
-      <h2>My Bookings</h2>
-      <button class="view-all-btn" (click)="viewAllBookings()">View All</button>
-    </div>
-    
-    <div *ngIf="recentBookings.length === 0" class="no-bookings">
-      <div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <h3>No bookings found</h3>
-        <p>You don't have any bookings yet. Start by booking a room!</p>
-        <button class="book-now-btn" (click)="navigateToRooms()">Book a Room</button>
+      <div class="section-header">
+        <h2>My Bookings</h2>
+        <button class="view-all-btn" (click)="viewAllBookings()">View All</button>
       </div>
-    </div>
-    
-    <div class="bookings-grid" *ngIf="recentBookings.length > 0">
-      <div *ngFor="let booking of recentBookings" class="booking-card">
-        <div class="booking-header">
-          <div class="booking-title">
-            <h4>{{booking.MeetingName || booking.Purpose || 'Meeting'}}</h4>
-            <span class="booking-id">#{{booking.BookingId}}</span>
-          </div>
-          <span class="status-badge" [class]="getStatusClass(booking.SessionStatus)">{{getStatusText(booking.SessionStatus)}}</span>
+
+      <!-- Empty State -->
+      <div *ngIf="recentBookings.length === 0" class="no-bookings">
+        <div class="empty-state">
+          <div class="empty-icon"><i class="fas fa-clipboard-list"></i></div>
+          <h3>No bookings found</h3>
+          <p>You don't have any bookings yet.</p>
+          <button class="book-now-btn" (click)="navigateToRooms()">Book a Room</button>
         </div>
-        
-        <div class="booking-details">
-          <div class="detail-item">
-            <span class="detail-icon">🏢</span>
-            <span class="detail-text">{{booking.ResourceName || 'Unknown Resource'}}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-icon">📍</span>
-            <span class="detail-text">{{booking.LocationName || 'Loading location...'}}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-icon">📅</span>
-            <span class="detail-text">{{booking.StartTime | date:'MMM d, y'}}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-icon">⏰</span>
-            <span class="detail-text">{{booking.StartTime | date:'h:mm a'}} - {{booking.EndTime | date:'h:mm a'}}</span>
-          </div>
-        </div>
-        
-        <div class="booking-actions" *ngIf="canCheckIn(booking) || canCheckOut(booking) || isBookingOverdue(booking)">
-          <div class="action-container">
-            <span class="action-label">{{getToggleLabel(booking)}}</span>
-            <div class="toggle-switch" 
-                 [class.checked-in]="getStatusText(booking.SessionStatus) === 'Checked In' && !isBookingOverdue(booking)"
-                 [class.overdue]="isBookingOverdue(booking) && getStatusText(booking.SessionStatus) === 'Checked In'"
-                 [class.disabled]="isBookingOverdue(booking)"
-                 (click)="!isBookingOverdue(booking) && toggleCheckInOut(booking)">
-              <div class="toggle-slider">
-                <span class="toggle-icon">{{getToggleIcon(booking)}}</span>
+      </div>
+
+      <!-- List State -->
+      <div class="bookings-grid" *ngIf="recentBookings.length > 0">
+        <div *ngFor="let booking of recentBookings" class="booking-card">
+
+          <!-- Main Info -->
+          <div class="booking-main-info">
+            <div class="booking-title">
+              <h4>
+                {{booking.MeetingName || booking.Purpose || 'Meeting'}}
+                <span class="booking-id">#{{booking.BookingId}}</span>
+                <span class="ms-2 status-badge" [class]="getStatusClass(booking.SessionStatus)">
+                  {{getStatusText(booking.SessionStatus)}}
+                </span>
+              </h4>
+            </div>
+
+            <div class="booking-meta">
+              <div class="meta-item">
+                <i class="fas fa-building meta-icon"></i>
+                <span>{{booking.ResourceName || 'Resource'}}</span>
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-map-marker-alt meta-icon"></i>
+                <span>{{booking.LocationName || 'Location'}}</span>
+              </div>
+              <div class="meta-item">
+                <i class="far fa-calendar meta-icon"></i>
+                <span>{{booking.StartTime | date:'MMM d, h:mm a'}} - {{booking.EndTime | date:'h:mm a'}}</span>
               </div>
             </div>
           </div>
+
+          <!-- Actions -->
+          <div class="booking-actions" *ngIf="canCheckIn(booking) || canCheckOut(booking) || isBookingOverdue(booking)">
+            <div class="action-container">
+              <span class="action-label">{{getToggleLabel(booking)}}</span>
+              <div class="toggle-switch"
+                [class.checked-in]="getStatusText(booking.SessionStatus) === 'Checked In' && !isBookingOverdue(booking)"
+                [class.overdue]="isBookingOverdue(booking) && getStatusText(booking.SessionStatus) === 'Checked In'"
+                [class.disabled]="isBookingOverdue(booking)"
+                (click)="!isBookingOverdue(booking) && toggleCheckInOut(booking)">
+                <div class="toggle-slider">
+                  <span class="toggle-icon">
+                    <i class="fas" [class.fa-check]="getStatusText(booking.SessionStatus) === 'Checked In'"
+                      [class.fa-power-off]="getStatusText(booking.SessionStatus) !== 'Checked In'"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
+
+    <!-- Notifications / Sidebar Widget -->
+    <div class="notifications-section">
+      <app-user-notifications></app-user-notifications>
+    </div>
+
   </div>
-  
-  <div class="notifications-section">
-    <app-user-notifications></app-user-notifications>
-  </div>
-</div>
 </div>

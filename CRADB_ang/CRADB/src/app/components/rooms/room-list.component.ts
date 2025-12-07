@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 import { RoomService } from '../../services/room.service';
 import { RoomResponse } from '../../models/room.models';
 import { LocationService, LocationResponse } from '../../services/location.service';
@@ -34,16 +35,21 @@ export class RoomListComponent implements OnInit {
     purpose: ''
   };
 
+  currentUser: any;
+
   constructor(
     private roomService: RoomService,
     private locationService: LocationService,
     private bookingService: BookingService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.currentUser = this.authService.getCurrentUser();
+  }
 
   ngOnInit(): void {
-    this.loadLocations();
-    this.loadAllRooms();
+    this.refreshData();
   }
 
   refreshData(): void {
@@ -57,6 +63,7 @@ export class RoomListComponent implements OnInit {
       next: (rooms) => {
         this.rooms = this.filterRoomsByCapacity(rooms || []);
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         Toastify({
@@ -161,21 +168,21 @@ export class RoomListComponent implements OnInit {
 
     this.bookingService.createBooking(booking).subscribe({
       next: (response) => {
+        this.bookingLoading = false; // Reset first
         Toastify({
           text: "Room booked successfully!",
           duration: 3000,
           backgroundColor: "#10b981"
         }).showToast();
         this.closeBookingModal();
-        this.bookingLoading = false;
       },
       error: (error) => {
+        this.bookingLoading = false; // Reset first
         Toastify({
-          text: "Failed to book room. Please try again.",
+          text: error?.error?.message || "Failed to book room. Please try again.",
           duration: 3000,
           backgroundColor: "#ef4444"
         }).showToast();
-        this.bookingLoading = false;
       }
     });
   }

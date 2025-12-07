@@ -1,5 +1,3 @@
-<app-navigation></app-navigation>
-
 <div class="room-booking-container">
   <div class="header">
     <h1>Book a room</h1>
@@ -11,7 +9,8 @@
       <label>Location</label>
       <select [(ngModel)]="selectedLocation" (change)="onLocationChange()">
         <option value="">Select Location</option>
-        <option *ngFor="let location of locations" [value]="location.LocationId">{{location.Name}}, {{location.City}}</option>
+        <option *ngFor="let location of locations" [value]="location.LocationId">{{location.Name}}, {{location.City}}
+        </option>
       </select>
     </div>
     <div class="filter-group">
@@ -74,7 +73,8 @@
       </div>
       <div class="form-group">
         <label>Participants *</label>
-        <input type="number" [(ngModel)]="bookingData.participantCount" name="participantCount" min="1" readonly required>
+        <input type="number" [(ngModel)]="bookingData.participantCount" name="participantCount" min="1" readonly
+          required>
       </div>
       <div class="form-group">
         <label>Purpose</label>
@@ -82,7 +82,8 @@
       </div>
       <div class="modal-actions">
         <button type="button" (click)="closeBookingModal()">Cancel</button>
-        <button type="submit" [disabled]="!bookingForm.valid || bookingLoading">{{bookingLoading ? 'Booking...' : 'Book Room'}}</button>
+        <button type="submit" [disabled]="!bookingForm.valid || bookingLoading">{{bookingLoading ? 'Booking...' : 'Book
+          Room'}}</button>
       </div>
     </form>
   </div>

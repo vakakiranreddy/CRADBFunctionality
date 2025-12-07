@@ -7,11 +7,12 @@ import { RoomResponse } from '../../../models/room.models';
 import { ResourceService, MaintenanceStatusDto, BlockResourceDto } from '../../../services/resource.service';
 import { AuthService } from '../../../services/auth.service';
 import { AuthResponse } from '../../../models/auth.models';
+import { SidebarComponent } from '../../layout/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-rooms',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule, SidebarComponent],
   templateUrl: './rooms.component.html',
   styleUrls: ['./rooms.component.css']
 })

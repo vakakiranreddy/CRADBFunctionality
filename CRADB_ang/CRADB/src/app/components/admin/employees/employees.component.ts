@@ -6,14 +6,14 @@ import { UserService, CreateUserRequest } from '../../../services/user.service';
 import { UserResponse } from '../../../models/user.models';
 import { DepartmentService, DepartmentResponse } from '../../../services/department.service';
 import { LocationService, LocationResponse } from '../../../services/location.service';
-
 import { AuthService } from '../../../services/auth.service';
 import { AuthResponse } from '../../../models/auth.models';
+import { SidebarComponent } from '../../layout/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, SidebarComponent],
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.css']
 })

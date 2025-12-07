@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -31,7 +31,8 @@ export class DashboardComponent implements OnInit {
     private checkInService: CheckInService,
     private roomService: RoomService,
     private locationService: LocationService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     this.currentUser = this.authService.getCurrentUser();
     // Subscribe to auth changes
@@ -39,29 +40,35 @@ export class DashboardComponent implements OnInit {
       this.currentUser = user;
     });
   }
+  // ...
+
 
   ngOnInit(): void {
-    // Check user role and redirect accordingly
     if (this.authService.isAdmin()) {
       this.router.navigate(['/admin']);
       return;
     }
-    
-    // Wait a bit for the auth state to be properly set after login
-    setTimeout(() => {
-      if (this.authService.isLoggedIn()) {
+
+    // Reactive subscription to handle user state
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+      if (user) {
+        // Only load data when we have a valid user
         this.loadBookings();
       }
-    }, 100);
-  }
+    });
 
-  get isAdmin(): boolean {
-    return this.authService.isAdmin();
+    // Also check immediate state if subscription doesn't fire immediately (BehaviorSubject should though)
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.currentUser = currentUser;
+      this.loadBookings();
+    }
   }
 
   loadBookings(): void {
-    console.log('Token:', this.authService.getToken());
-    console.log('Is logged in:', this.authService.isLoggedIn());
+    // Prevent duplicate loading or loading without user
+    if (!this.currentUser) return;
     
     // Load locations first, then bookings
     this.locationService.getAllLocations().subscribe({
@@ -70,12 +77,8 @@ export class DashboardComponent implements OnInit {
         this.loadBookingsData();
       },
       error: (error) => {
-        Toastify({
-          text: "Failed to load locations",
-          duration: 3000,
-          backgroundColor: "#f59e0b"
-        }).showToast();
-        this.loadBookingsData(); // Still load bookings even if locations fail
+        console.error('Failed to load locations', error);
+        this.loadBookingsData(); // Still load bookings
       }
     });
   }
@@ -124,6 +127,7 @@ export class DashboardComponent implements OnInit {
         this.upcomingBookings = enhancedBookings.filter((b: BookingResponse) => 
           new Date(b.StartTime) > now && this.getStatusText(b.SessionStatus) === 'Reserved'
         );
+        this.cdr.detectChanges();
       },
       error: (error: any) => {
         Toastify({
@@ -131,6 +135,7 @@ export class DashboardComponent implements OnInit {
           duration: 3000,
           backgroundColor: "#ef4444"
         }).showToast();
+        this.cdr.detectChanges();
       }
     });
   }

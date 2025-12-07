@@ -60,4 +60,10 @@ export class UserService {
   searchUsers(keyword: string): Observable<UserResponse[]> {
     return this.http.get<UserResponse[]>(`${this.apiUrl}/search?keyword=${keyword}`);
   }
+
+  uploadProfileImage(userId: number, file: File): Observable<{ imageUrl: string }> {
+    const formData = new FormData();
+    formData.append('profileImage', file);
+    return this.http.post<{ imageUrl: string }>(`${this.apiUrl}/${userId}/image`, formData);
+  }
 }

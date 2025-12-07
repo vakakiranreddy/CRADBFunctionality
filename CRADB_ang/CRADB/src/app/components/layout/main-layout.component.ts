@@ -14,17 +14,19 @@ import { filter } from 'rxjs/operators';
 })
 export class MainLayoutComponent implements OnInit {
   isAdminRoute = false;
+  isSidebarOpen = false;
 
   constructor(private router: Router) {}
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
 
   ngOnInit() {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
-      this.isAdminRoute = event.url.startsWith('/admin');
+      // Logic for layout can be simplified/removed if always showing sidebar
     });
-    
-    // Check initial route
-    this.isAdminRoute = this.router.url.startsWith('/admin');
   }
 }

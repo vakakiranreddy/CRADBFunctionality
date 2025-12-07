@@ -1,25 +1,29 @@
 .dashboard-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
-  padding-top: calc(64px + 2rem);
-  background: #f8fafc;
+  width: 100%;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   min-height: 100vh;
 }
 
 .dashboard-header {
   margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.4);
 }
 
 .dashboard-header h1 {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #1e293b;
+  color: white;
   margin: 0 0 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .welcome-text {
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 1.1rem;
   margin: 0;
 }
@@ -246,22 +250,37 @@
 .detail-icon {
   font-size: 1rem;
   opacity: 0.7;
-  width: 20px;
 }
 
-.detail-text {
-  color: #475569;
-  font-size: 0.9rem;
+.booking-meta {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  color: var(--gray-500);
+  font-size: 0.875rem;
 }
 
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.meta-icon {
+  font-size: 1rem;
+  color: var(--gray-400);
+}
+
+/* Action Area */
 .booking-actions {
-  border-top: 1px solid #e2e8f0;
-  padding-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
+/* Toggle Switch Styling */
 .action-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
 }
 

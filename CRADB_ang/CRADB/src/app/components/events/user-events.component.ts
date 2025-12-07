@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService, EventResponse } from '../../services/event.service';
@@ -29,13 +29,26 @@ export class UserEventsComponent implements OnInit {
     private eventService: EventService,
     private rsvpService: EventRsvpService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     this.currentUser = this.authService.getCurrentUser();
   }
 
   ngOnInit(): void {
-    this.loadEvents();
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+      if (user) {
+        this.loadEvents();
+      }
+    });
+    
+    // Initial check
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.currentUser = user;
+      this.loadEvents();
+    }
   }
 
   loadEvents(): void {
@@ -43,9 +56,11 @@ export class UserEventsComponent implements OnInit {
     this.eventService.getAllEvents().subscribe({
       next: (events) => {
         this.events = events.filter(event => event.IsActive);
+        this.filteredEvents = this.events;
         this.loadUserRsvps();
         this.loadEventCounts();
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error loading events:', error);
@@ -58,7 +73,11 @@ export class UserEventsComponent implements OnInit {
     this.events.forEach(event => {
       this.rsvpService.getUserRsvp(event.EventId).subscribe({
         next: (rsvp) => {
-          this.userRsvps[event.EventId] = this.getStatusString(rsvp.Status);
+          if (rsvp) {
+            this.userRsvps[event.EventId] = this.getStatusString(rsvp.Status);
+          } else {
+            this.userRsvps[event.EventId] = '';
+          }
         },
         error: () => {
           this.userRsvps[event.EventId] = '';
@@ -75,18 +94,21 @@ export class UserEventsComponent implements OnInit {
       this.rsvpService.getInterestedCount(eventId).subscribe({
         next: (response) => {
           this.eventCounts[eventId].interested = response.interestedCount;
+          this.cdr.detectChanges();
         }
       });
       
       this.rsvpService.getMaybeCount(eventId).subscribe({
         next: (response) => {
           this.eventCounts[eventId].maybe = response.maybeCount;
+          this.cdr.detectChanges();
         }
       });
       
       this.rsvpService.getNotInterestedCount(eventId).subscribe({
         next: (response) => {
           this.eventCounts[eventId].notInterested = response.notInterestedCount;
+          this.cdr.detectChanges();
         }
       });
     });

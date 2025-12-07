@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 import { NavigationComponent } from '../shared/navigation.component';
 import { DeskService, DeskResponse } from '../../services/desk.service';
 import { LocationService, LocationResponse } from '../../services/location.service';
@@ -24,11 +25,17 @@ export class DeskListComponent implements OnInit {
   amenityFilter = '';
   showAvailableOnly = false;
 
+  currentUser: any;
+
   constructor(
     private router: Router,
     private deskService: DeskService,
-    private locationService: LocationService
-  ) {}
+    private locationService: LocationService,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
+  ) {
+     this.currentUser = this.authService.getCurrentUser();
+  }
 
   ngOnInit(): void {
     this.loadLocations();
@@ -57,6 +64,7 @@ export class DeskListComponent implements OnInit {
         this.desks = desks;
         this.filteredDesks = [...this.desks];
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         Toastify({

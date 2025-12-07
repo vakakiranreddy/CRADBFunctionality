@@ -308,8 +308,28 @@ recentBookings: any[] = [];
           const eventDate = new Date(event.Date).toISOString().split('T')[0];
           return eventDate === dayString && event.IsActive;
         });
+        
+        day.hasBooking = this.allBookings.some(booking => {
+          const bookingDate = new Date(booking.StartTime).toISOString().split('T')[0];
+          return bookingDate === dayString;
+        });
       });
     });
+  }
+  
+  onDateClick(day: any): void {
+    if (!day.isCurrentMonth) return;
+    
+    const currentMonth = this.currentDate.getMonth();
+    const currentYear = this.currentDate.getFullYear();
+    const clickedDate = new Date(currentYear, currentMonth, day.date);
+    const dateString = clickedDate.toISOString().split('T')[0];
+    
+    if (day.hasEvent) {
+      this.router.navigate(['/admin/events']);
+    } else if (day.hasBooking) {
+      this.router.navigate(['/admin/room-bookings']);
+    }
   }
 
   onLocationChange(event: any): void {
@@ -352,7 +372,8 @@ getTodayDate(): string {
           date: currentDay.getDate(),
           isToday: currentDay.toDateString() === today.toDateString(),
           isCurrentMonth: currentDay.getMonth() === month,
-          hasEvent: false
+          hasEvent: false,
+          hasBooking: false
         });
       }
       this.calendarWeeks.push(weekDays);

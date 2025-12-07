@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface CreateRsvpDto {
@@ -65,8 +66,15 @@ export class EventRsvpService {
     return this.http.put<any>(`${this.apiUrl}/rsvp`, dto);
   }
 
-  getUserRsvp(eventId: number): Observable<RsvpResponseDto> {
-    return this.http.get<RsvpResponseDto>(`${this.apiUrl}/user-rsvp/${eventId}`);
+  getUserRsvp(eventId: number): Observable<RsvpResponseDto | null> {
+    return this.http.get<RsvpResponseDto>(`${this.apiUrl}/user-rsvp/${eventId}`).pipe(
+      catchError(error => {
+        if (error.status === 404) {
+          return of(null);
+        }
+        throw error;
+      })
+    );
   }
 
   getRsvpsByEvent(eventId: number): Observable<RsvpResponseDto[]> {

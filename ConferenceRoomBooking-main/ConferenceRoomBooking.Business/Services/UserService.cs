@@ -231,6 +231,36 @@ Conference Room Booking Team";
                 _logger.LogError(ex, "Error updating profile for user with ID {UserId}", userId);
                 throw new InvalidOperationException($"Failed to update profile for user with ID {userId}", ex);
             }
+
+        }
+
+        public async Task UploadProfileImageAsync(int userId, Microsoft.AspNetCore.Http.IFormFile image)
+        {
+            try
+            {
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user == null)
+                {
+                    _logger.LogWarning("Attempted to upload image for non-existent user with ID {UserId}", userId);
+                    throw new ArgumentException($"User with ID {userId} not found");
+                }
+
+                if (image != null)
+                {
+                    if (!ImageHelper.IsValidImageFile(image))
+                    {
+                        throw new ArgumentException("Invalid image file. Please upload a valid image (JPG, PNG, GIF, BMP) under 5MB");
+                    }
+                    user.ProfileImage = await ImageHelper.ConvertToByteArrayAsync(image);
+                    user.UpdatedAt = DateTime.UtcNow;
+                    await _userRepository.UpdateAsync(user);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error uploading profile image for user {UserId}", userId);
+                throw;
+            }
         }
 
         public async Task<bool> IsEmailAvailableAsync(string email)

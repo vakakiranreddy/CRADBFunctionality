@@ -165,6 +165,39 @@ namespace ConferenceRoomBooking.API.API.Controllers
                 return StatusCode(500, new { message = "An error occurred while updating the profile", error = ex.Message });
             }
         }
+
+        [HttpPost("{userId}/image")]
+        [RequestSizeLimit(5 * 1024 * 1024)] // 5MB limit
+        public async Task<IActionResult> UploadProfileImage(int userId, IFormFile profileImage)
+        {
+            try
+            {
+                if (userId <= 0)
+                    return BadRequest(new { message = "Invalid user ID" });
+
+                if (profileImage == null || profileImage.Length == 0)
+                    return BadRequest(new { message = "No image file provided" });
+
+                // Security check
+                var currentUserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
+                if (currentUserId != userId)
+                {
+                     return Forbid();
+                }
+
+                await _userService.UploadProfileImageAsync(userId, profileImage);
+                return Ok(new { message = "Profile image updated successfully" });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error uploading image for user {UserId}", userId);
+                return StatusCode(500, new { message = "An error occurred", error = ex.Message });
+            }
+        }
     }
 }
 

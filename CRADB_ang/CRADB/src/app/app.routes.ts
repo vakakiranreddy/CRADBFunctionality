@@ -38,6 +38,8 @@ export const routes: Routes = [
       { path: 'bookings', component: MyBookingsComponent },
       { path: 'events', component: UserEventsComponent },
       { path: 'events/:id', loadComponent: () => import('./components/events/event-details.component').then(m => m.EventDetailsComponent) },
+      { path: 'calendar', loadComponent: () => import('./components/shared/calendar/calendar.component').then(m => m.CalendarComponent) },
+      { path: 'notifications', loadComponent: () => import('./components/user/user-notifications.component').then(m => m.UserNotificationsComponent) },
       { path: 'profile', loadComponent: () => import('./components/user/user-profile.component').then(m => m.UserProfileComponent) },
       { 
         path: 'admin', 
@@ -54,7 +56,7 @@ export const routes: Routes = [
           { path: 'room-bookings', component: RoomBookingsComponent },
           { path: 'desk-bookings', component: DeskBookingsComponent },
           { path: 'my-bookings', component: AdminMyBookingsComponent },
-          { path: 'calendar', component: AdminDashboardComponent },
+          { path: 'calendar', loadComponent: () => import('./components/shared/calendar/calendar.component').then(m => m.CalendarComponent) },
           { path: 'events', component: EventManagementComponent },
           { path: 'events/:id/rsvp', loadComponent: () => import('./components/admin/event-rsvp-details.component').then(m => m.EventRsvpDetailsComponent) },
           { path: 'notifications', loadComponent: () => import('./components/admin/notification-management.component').then(m => m.NotificationManagementComponent) },

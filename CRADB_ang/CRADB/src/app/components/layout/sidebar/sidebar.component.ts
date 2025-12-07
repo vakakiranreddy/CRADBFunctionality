@@ -1,7 +1,9 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { AuthResponse } from '../../../models/auth.models';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,17 +12,37 @@ import { AuthService } from '../../../services/auth.service';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit, OnDestroy {
+  @Input() mobileOpen = false;
+  @Output() closeMobile = new EventEmitter<void>();
   showBookingDropdown = false;
+  currentUser: AuthResponse | null = null;
+  private userSubscription: Subscription | null = null;
 
   constructor(private authService: AuthService) {}
 
+  ngOnInit(): void {
+    this.userSubscription = this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
+
   get isAdmin(): boolean {
-    return this.authService.isAdmin();
+    return this.currentUser?.Role === 'Admin';
   }
 
   toggleBookingDropdown(): void {
     this.showBookingDropdown = !this.showBookingDropdown;
+  }
+
+  close(): void {
+    this.closeMobile.emit();
   }
 
   @HostListener('document:click', ['$event'])

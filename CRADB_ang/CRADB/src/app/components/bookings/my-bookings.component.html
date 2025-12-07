@@ -1,4 +1,3 @@
-<app-navigation></app-navigation>
 <div class="my-bookings-container">
   <div class="page-header">
     <h1>My Bookings</h1>
@@ -28,19 +27,19 @@
       </div>
     </div>
   </div>
-  
+
   <div *ngIf="loading" class="loading-state">
     <div class="loading-spinner"></div>
     <p>Loading your bookings...</p>
   </div>
-  
+
   <div *ngIf="!loading && bookings.length === 0" class="empty-state">
     <div class="empty-icon">📅</div>
     <h3>No bookings found</h3>
     <p>You don't have any bookings yet. Start by booking a room!</p>
     <button class="book-now-btn" (click)="navigateToRooms()">Book a Room</button>
   </div>
-  
+
   <div *ngIf="!loading && bookings.length > 0" class="bookings-section">
     <div class="section-header">
       <h2>All Bookings</h2>
@@ -54,11 +53,11 @@
         </select>
       </div>
     </div>
-    
+
     <div class="bookings-grid">
-      <div *ngFor="let booking of filteredBookings; trackBy: trackByBookingId" 
-           class="booking-card" [ngClass]="getBookingStatusClass(booking)">
-        
+      <div *ngFor="let booking of filteredBookings; trackBy: trackByBookingId" class="booking-card"
+        [ngClass]="getBookingStatusClass(booking)">
+
         <div class="booking-header">
           <div class="booking-title">
             <h4>{{booking.MeetingName || 'Meeting'}}</h4>
@@ -68,7 +67,7 @@
             {{getStatusText(booking.SessionStatus)}}
           </span>
         </div>
-        
+
         <div class="booking-details">
           <div class="detail-row">
             <span class="detail-icon">🏢</span>
@@ -76,7 +75,8 @@
           </div>
           <div class="detail-row">
             <span class="detail-icon">📍</span>
-            <span class="detail-text">{{booking.BuildingName || 'Unknown'}}, {{booking.FloorName || 'Unknown Floor'}}</span>
+            <span class="detail-text">{{booking.BuildingName || 'Unknown'}}, {{booking.FloorName || 'Unknown
+              Floor'}}</span>
           </div>
           <div class="detail-row">
             <span class="detail-icon">📅</span>
@@ -97,23 +97,17 @@
         </div>
 
         <div class="booking-actions" *ngIf="hasActions(booking)">
-          <button *ngIf="canCheckIn(booking)" 
-                  class="action-btn check-in" 
-                  (click)="checkIn(booking.BookingId)" 
-                  [disabled]="processing">
+          <button *ngIf="canCheckIn(booking)" class="action-btn check-in" (click)="checkIn(booking.BookingId)"
+            [disabled]="processing">
             <span class="btn-icon">✅</span>
             Check In
           </button>
-          <button *ngIf="canCheckOut(booking)" 
-                  class="action-btn check-out" 
-                  (click)="checkOut(booking.BookingId)" 
-                  [disabled]="processing">
+          <button *ngIf="canCheckOut(booking)" class="action-btn check-out" (click)="checkOut(booking.BookingId)"
+            [disabled]="processing">
             <span class="btn-icon">🚪</span>
             Check Out
           </button>
-          <button *ngIf="canCancel(booking)" 
-                  class="action-btn cancel" 
-                  (click)="cancelBooking(booking.BookingId)">
+          <button *ngIf="canCancel(booking)" class="action-btn cancel" (click)="cancelBooking(booking.BookingId)">
             <span class="btn-icon">❌</span>
             Cancel
           </button>

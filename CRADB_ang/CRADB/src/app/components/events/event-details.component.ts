@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventService, EventResponse } from '../../services/event.service';
@@ -25,7 +25,8 @@ export class EventDetailsComponent implements OnInit {
     private router: Router,
     private eventService: EventService,
     private rsvpService: EventRsvpService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {
     this.currentUser = this.authService.getCurrentUser();
   }
@@ -34,20 +35,26 @@ export class EventDetailsComponent implements OnInit {
     const eventId = this.route.snapshot.params['id'];
     if (eventId) {
       this.loadEvent(+eventId);
+    } else {
+      this.loading = false; // Stop loading if no ID
+      console.error('No event ID provided in route');
     }
   }
 
   loadEvent(eventId: number): void {
+    this.loading = true;
     this.eventService.getEventById(eventId).subscribe({
       next: (event) => {
         this.event = event;
         this.loadUserRsvp(eventId);
         this.loadEventCounts(eventId);
         this.loading = false;
+        this.cdr.detectChanges(); // Force update
       },
       error: (error) => {
         console.error('Error loading event:', error);
         this.loading = false;
+        this.cdr.detectChanges(); // Force update
       }
     });
   }
@@ -55,10 +62,16 @@ export class EventDetailsComponent implements OnInit {
   loadUserRsvp(eventId: number): void {
     this.rsvpService.getUserRsvp(eventId).subscribe({
       next: (rsvp) => {
-        this.userRsvpStatus = this.getStatusString(rsvp.Status);
+        if (rsvp) {
+          this.userRsvpStatus = this.getStatusString(rsvp.Status);
+        } else {
+          this.userRsvpStatus = '';
+        }
+        this.cdr.detectChanges();
       },
       error: () => {
         this.userRsvpStatus = '';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -67,18 +80,21 @@ export class EventDetailsComponent implements OnInit {
     this.rsvpService.getInterestedCount(eventId).subscribe({
       next: (response) => {
         this.eventCounts.interested = response.interestedCount;
+        this.cdr.detectChanges();
       }
     });
     
     this.rsvpService.getMaybeCount(eventId).subscribe({
       next: (response) => {
         this.eventCounts.maybe = response.maybeCount;
+        this.cdr.detectChanges();
       }
     });
     
     this.rsvpService.getNotInterestedCount(eventId).subscribe({
       next: (response) => {
         this.eventCounts.notInterested = response.notInterestedCount;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -99,6 +115,7 @@ export class EventDetailsComponent implements OnInit {
       next: () => {
         this.userRsvpStatus = this.getStatusString(status);
         this.loadEventCounts(this.event!.EventId);
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error updating RSVP:', error);
@@ -119,9 +136,9 @@ export class EventDetailsComponent implements OnInit {
   getEventImage(): string {
     if (!this.event) return '';
     const images = [
-      'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800',
-      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800'
+      'https://images.unsplash.com/photo-1511578314322-379afb476865?w=1200',
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200',
+      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200'
     ];
     return images[this.event.EventId % images.length];
   }

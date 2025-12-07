@@ -12,6 +12,7 @@ export interface AuthResponse {
   Role: string;
   Token: string;
   TokenExpiresAt: Date;
+  ProfileImage?: string;
 }
 
 export interface ChangePasswordRequest {

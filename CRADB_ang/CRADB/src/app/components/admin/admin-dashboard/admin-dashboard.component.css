@@ -1,9 +1,4 @@
-.dashboard-container {
-  padding: 0;
-  background-color: #f8f9fa;
-  min-height: 100vh;
-  margin: 0;
-}
+/* .dashboard-container removed - handled by main layout */
 
 .card {
   border: 1px solid #dee2e6;
@@ -31,6 +26,18 @@
 
 .calendar-day:hover:not(.current-day) {
   background: #f5f5f5;
+}
+
+.calendar-day.has-event {
+  background: #f0f4ff;
+}
+
+.calendar-day.has-booking {
+  background: #f0fdf4;
+}
+
+.calendar-day.has-event.has-booking {
+  background: linear-gradient(135deg, #f0f4ff 50%, #f0fdf4 50%);
 }
 
 .card:hover {
